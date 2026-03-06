@@ -8,10 +8,10 @@ pool.getConnection((err, connection) => {
         console.error('Erro ao conectar ao Banco de Dados: ', err)
         process.exit(1)
     }
-    console.log('Conectado ao SQL!')
+    console.log('Conectado ao SQL!🛠️')
     connection.release()
 })
 
 app.listen (PORT, () => {
-    console.log("Servidor rodando! 🎉")
+    console.log("Servidor rodando!🎉")
 })
