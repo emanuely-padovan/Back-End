@@ -202,4 +202,6 @@ app.delete('/filmes/:id', async(req, res) => {
     }
 })
 
+
+
 module.exports = app // Garante que eu consiga acessar o app em outros arquivos, como o server.js
