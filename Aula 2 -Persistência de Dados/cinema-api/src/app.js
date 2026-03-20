@@ -292,59 +292,57 @@ app.post('/salas', async(req, res) => {
     }
 })
 
-// Continuação: 
+// Continuação: 20/03/2026
+
 app.put('/salas/:id', async(req, res) => {
     try {
         const {id} = req.params
-        const {titulo, genero, duracao, classificacao, data_lancamento} = req.body
+        const {nome, capacidade} = req.body
 
         if (!id || isNaN(id)) {
             return res.status(400).json({
                 sucesso: false,
-                mensagem: "ID de filme inválido!"
+                mensagem: "ID de sala inválido!"
             })
         }
 
-        const filmeExiste = await queryAsync ("SELECT * FROM filme WHERE id = ?", [id])
-        if (filmeExiste.length === 0) {
+        const salaExiste = await queryAsync ("SELECT * FROM sala WHERE id = ?", [id])
+        if (salaExiste.length === 0) {
             return res.status(404).json({
                 sucesso: false,
-                mensagem: "Filme não encontrado!"
+                mensagem: "Sala não encontrada!"
             })
         }
 
-        const filmeAtualizado = {}
+        const salaAtualizada = {}
 
-        if (titulo !== undefined) filmeAtualizado.titulo = titulo.trim()
-        if (genero !== undefined) filmeAtualizado.genero = genero.trim()
-        if (duracao !== undefined) {
-            if (typeof duracao !== 'number'|| duracao <= 0 )
+        if (nome !== undefined) salaAtualizada.nome = nome.trim()
+        if (capacidade !== undefined) {
+            if (typeof capacidade !== 'number'|| capacidade <= 0 )
                 return res.status(400).json({
                     sucesso: false,
-                    mensagem: "Duração deve ser um número positivo..."
+                    mensagem: "Capacidade deve ser um número positivo..."
             })
-            filmeAtualizado.duracao = duracao
+            salaAtualizada.capacidade = capacidade
         }
-        if (classificacao !== undefined) filmeAtualizado.classificacao = classificacao.trim()
-        if (data_lancamento !== undefined) filmeAtualizado.data_lancamento = data_lancamento.trim()
 
-        if (Object.keys (filmeAtualizado).length === 0) {
+        if (Object.keys (salaAtualizada).length === 0) {
             return res.status(400).json({
                 sucesso: false, 
                 mensagem: "Nenhum campo para atualizar..."
             })
         }
 
-        await queryAsync ("UPDATE filme SET ? WHERE id = ?", [filmeAtualizado, id])
+        await queryAsync ("UPDATE sala SET ? WHERE id = ?", [salaAtualizada, id])
         res.json({
             sucesso: true, 
-            mensagem: "Filme atualizado!"
+            mensagem: "Sala atualizada!"
         })
     } catch (erro){
-        console.error("Erro ao atualizar filme: ", erro)
+        console.error("Erro ao atualizar sala: ", erro)
         res.status(500).json({
             sucesso: false,
-            mensagem: "Erro ao atualizar filme!",
+            mensagem: "Erro ao atualizar sala!",
             erro: erro.message
         })
     }
@@ -352,36 +350,186 @@ app.put('/salas/:id', async(req, res) => {
 
 app.delete('/salas/:id', async(req, res) => {
     try {
-        const {id}= req.params // Encontrar o Id do filme que eu quero apagar
+        const {id}= req.params
 
         if (!id || isNaN(id)) {
             return res.status(400).json({
                 sucesso: false,
-                mensagem: "ID de filme inválido!"
+                mensagem: "ID de sala inválido!"
             })
         }
 
-        const filmeExiste = await queryAsync ("SELECT * FROM filme WHERE id = ?", [id])
-        if (filmeExiste.length === 0) { // A busca não retornou em nada...
+        const salaExiste = await queryAsync ("SELECT * FROM sala WHERE id = ?", [id])
+        if (salaExiste.length === 0) { 
             return res.status(404).json({
                 sucesso: false,
-                mensagem: "Filme não encontrado!"
+                mensagem: "Sala não encontrado!"
             })
         }
 
-        await queryAsync ("DELETE FROM filme WHERE id = ?", [id])
+        await queryAsync ("DELETE FROM sala WHERE id = ?", [id])
         res.json({
             sucesso: true,
-            mensagem: "Filme foi apagado com sucesso!🎉"
+            mensagem: "Sala foi apagado com sucesso!🎉"
         })
     } catch (erro) {
-        console.error("Erro ao deletar o filme: ", erro)
+        console.error("Erro ao deletar o sala: ", erro)
         res.status(500).json({
             sucesso: false,
-            mensagem: "Erro ao deletar o filme!",
+            mensagem: "Erro ao deletar o sala!",
             erro: erro.message
         })        
     }
 })
 
-module.exports = app // Garante que eu consiga acessar o app em outros arquivos, como o server.js
+app.get('/sessoes', async(req, res) => {
+    try {
+        const sessoes = await queryAsync('SELECT * FROM sessao')
+        res.json({
+            sucesso: true, 
+            dados: sessoes,
+            total: sessoes.length
+        })
+    } catch (error) {
+        console.log('Erro ao listar sessões: ', error)
+        res.status(500).json({
+            sucesso: false,
+            mensagem: "Erro ao listar sessões!",
+            erro: error.message
+        })
+    }
+})
+
+app.get('/sessoes/:id', async(req, res) => {
+    try {
+        const {id} = req.params
+        if (!id || isNaN(id)) {
+            return res.status(400).json({
+                sucesso: false,
+                mensagem: "ID de sessão inválido!"
+            })
+        }
+        const sessao = await queryAsync('SELECT * FROM sessao WHERE id = ?', [id])
+
+        if (sessao.length === 0) {
+            return res.status(404).json({
+                sucesso: false,
+                mensagem: "Sessão não encontrada!"
+            })
+        }
+        res.json({
+            sucesso: true, 
+            dados: sessao [0]
+        })
+    } catch (error) {
+        console.log("Erro ao listar as sessões: ", error)
+        res.status(500).json ({
+            sucesso: false,
+            mensagem: "Erro ao listar sessões!",
+            erro: error.message
+        })
+    }
+})
+
+// Continuação do POST e PUT: 
+app.post('/sessoes', async(req, res) => {
+    try {
+        const {filme_id, sala_id, data_hora, preco} = req.body
+        if (!filme_id || !sala_id || !data_hora || !preco) {
+            return res.status(400).json({
+                sucesso: false,
+                mensagem: "Informações da sala/filme, horário e preço são itens obrigatórios!"
+            })
+        }
+
+        if (filme_id !== undefined){
+            if(isNaN(filme_id)) {
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: "ID de filme não existe!"
+                })
+            }
+        }
+        if(await queryAsync("SELECT * FROM filme WHERE id = ?", [filme_id]).length == 0) {
+            return res.status(400).json ({
+                sucesso: false,
+                mensagem: "Erro ao procurar ID!"
+            })
+        }
+
+        if (sala_id !== undefined){
+            if(isNaN(sala_id)) {
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: "ID de sala não existe!"
+                })
+            }
+        }
+        if(await queryAsync("SELECT * FROM sala WHERE id = ?", [sala_id]).length == 0) {
+            return res.status(400).json ({
+                sucesso: false,
+                mensagem: "Erro ao procurar ID!"
+            })
+        }
+
+        const novaSessao = {
+            filme_id: filme_id,
+            sala_id: sala_id,
+            data_hora: data_hora,
+            preco: preco
+        }
+
+        const resultado = await queryAsync ("INSERT INTO sessao SET ?", [novaSessao])
+        res.status(201).json({
+            sucesso: true, 
+            mensagem:"Sessão criada com sucesso!",
+            id: resultado.insertId
+        })
+    } catch (error) {
+        console.log("Erro ao adicionar sessões: ", error)
+        res.status(500).json ({
+            sucesso: false,
+            mensagem: "Erro ao adicionar sessões!",
+            erro: error.message
+        })
+    }
+})
+
+
+
+app.delete('/sessoes/:id', async(req, res) => {
+    try {
+        const {id} = req.params
+
+        if (!id ||isNaN(id)) {
+            return res.status(400).json ({
+                sucesso: false,
+                mensagem: "ID de sessão inválido!"
+            })
+        }
+
+        const sessaoExiste = await queryAsync ("SELECT * FROM sessao WHERE id = ?", [id])
+        if(sessaoExiste.length === 0) {
+            return res.status(404).json({
+                sucesso: false,
+                mensagem: "Sessão não encontrada!"
+            })
+        }
+        await queryAsync ("DELETE FROM sessao WHERE id = ?", [id])
+        res.json({
+            sucesso: true, 
+            mensagem: "Sessão foi apagada com sucesso!"
+        })
+    } catch (error) {
+        console.log("Erro ao deletar a sessão: ", error)
+        res.status(500).json({
+            sucesso: false,
+            mensagem: "Erro ao deletar a sessão!",
+            erro: error.message
+        })
+    }
+})
+
+// Continuação do Projeto: 
+
+module.exports = app
