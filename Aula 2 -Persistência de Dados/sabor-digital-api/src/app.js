@@ -1,4 +1,3 @@
-// NOME: EMANUELY MACEDO PADOVAN
 
 const express = require('express')
 const pool = require('./config/database')
@@ -21,7 +20,6 @@ app.get ('/', (req, res) => {
 
 app.get('/produtos', async(req, res) => {
     try {
-        // Ordem dos IDs dos produtos irão aparecer em ordem decrescente...
         const produtos = await queryAsync('SELECT * FROM produto ORDER BY id DESC')
         res.json({
             sucesso: true, 
@@ -40,7 +38,6 @@ app.get('/produtos', async(req, res) => {
 
 app.get('/produtos/:id', async(req, res) => {
     try {
-        // Validação do ID, para aceitar apenas valores numéricos
         const {id} = req.params
         if (!id || isNaN(id)) {
             return res.status(400).json({

@@ -1,4 +1,3 @@
-// NOME: EMANUELY MACEDO PADOVAN
 
 const pool = require('./config/database')
 const app = require('./app')
