@@ -44,7 +44,7 @@ app.get('/produtos', async (req, res) => {
 
 
 // 2) BUSCAR PRODUTO POR ID
-app.get('/produtos/id', async (req, res) => {
+app.get('/produtos/:id', async (req, res) => {
     try {
         const { id } = req.params
 
