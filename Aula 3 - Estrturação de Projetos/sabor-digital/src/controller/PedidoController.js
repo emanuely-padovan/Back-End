@@ -15,7 +15,17 @@ class PedidoController {
     }
 
     async listarPorId(req, res) {}
-    async cadastrar(req, res) {}
+    async cadastrar(req, res) {
+        try {
+            const pedido = await PedidoService.criarPedido(req.body)
+            res.status(201).json ({
+                mensagem: 'Pedido criado com sucesso.',
+                pedido
+            })
+        } catch (erro) {
+            
+        }
+    }
     async atualizar(req, res) {}
     async deletar(req, res) {}
 }
