@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 const produtoRoutes = require('./ProdutoRoute')
+const pedidoRoutes = require('./PedidoRoute')
 
 router.get('/', (req, res) => {
     res.json({
@@ -12,3 +13,6 @@ router.get('/', (req, res) => {
 })
 
 router.use('/produtos', produtoRoutes)
+router.use('/pedidos', pedidoRoutes)
+
+module.exports = router
