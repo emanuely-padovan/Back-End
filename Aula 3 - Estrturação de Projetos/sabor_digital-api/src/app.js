@@ -1,7 +1,16 @@
 const express = require('express');
+const routes = require('./routes');
+
 const cors = require('cors');
 const app = express();
-const routes = require('./routes'); 
+
+const path = require('path');
+app.use(
+    '/uploads',
+    express.static(
+        path.resolve('uploads')
+    )
+);
 
 // Middlewares globais
 app.use(cors()); // Habilita o CORS para permitir requisições do frontend
