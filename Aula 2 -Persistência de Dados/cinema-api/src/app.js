@@ -8,7 +8,7 @@ app.use(express.json())
 // Função Assíncrona - 04/03
 const queryAsync = (sql, values = []) => { // Condições para que algo seja tratado da forma correta... então uma query e alguns valores são recebidas 
     return new Promise ((resolve, reject) => { // Promise: Irá aceitar ou recusar as solicitações
-        pool.query(sql, values, (err, results) => {
+        pool.query(sql, values, (err, results) => { //
             if(err) reject(err)
             else resolve(results)
         })
